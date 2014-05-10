@@ -1,10 +1,14 @@
 package com.divinedube.yamba;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +32,7 @@ public class StatusFragment extends Fragment implements  OnClickListener{
     private EditText editStatus;
     private TextView textCount;
     private int defaultTextColor;
+    private SharedPreferences prefs;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,21 +95,38 @@ public class StatusFragment extends Fragment implements  OnClickListener{
 
         @Override
         protected String doInBackground(String... params) {
-            YambaClient yambaCloud = new YambaClient("student", "password");
 
+//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//
+//            YambaClient yambaCloud = new YambaClient("student", "password");
             //just wanted to catch any exception that will happen
+
             try {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String username = prefs.getString("username", "");
+                String password = prefs.getString("username", "");
+
+                if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
+                    getActivity().startActivity(new Intent(getActivity(), StatusActivity.class ));
+                    return "please update you username and password";
+                }
+
+                YambaClient yambaCloud = new YambaClient(username, password);
                 yambaCloud.postStatus(params[0]);
-                return "successfully posted";
+
+                return "status posted";
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return "failed to post status to Yamba services";
             }
 
         }
+
         @Override
         protected void onPostExecute(String result){
             super.onPostExecute(result);
+            //  change the (StatusFragment.this.getActivity())  to refer to which ever class it is in
             Toast.makeText(StatusFragment.this.getActivity(), result, Toast.LENGTH_LONG).show();
         }
 

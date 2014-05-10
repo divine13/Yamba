@@ -20,10 +20,6 @@ public class StatusActivity extends Activity{
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.status, menu);
 
-        return true;
-    }
+
 }
